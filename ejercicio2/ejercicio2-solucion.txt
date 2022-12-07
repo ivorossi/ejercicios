@@ -1,0 +1,3 @@
+Me costo un poco mas de lo que pense que iba a costar, pero conocia el problema(uno parecido de decimal
+a romano con TDD), trate de imitar lo que ya habia echo quizas en ese otro ejercicio tiene mas sentido la 
+solucion que le di, nada espero su feedback creo que este ejercicio tambien se puede mejorar.  
