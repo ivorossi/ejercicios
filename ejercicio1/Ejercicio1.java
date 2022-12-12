@@ -60,7 +60,7 @@ class StainFinder {
 		countedPosition = new boolean[m][n];
 	}
 
-	private void findByAllDirection(int[] position, List<char[]> M1) {
+	private void findByAllDirection(int[] position, List<char[]> matrix) {
 		int i = position [0];
 		int j = position [1];
 		int di;
@@ -69,28 +69,28 @@ class StainFinder {
 		for( int[] direction : this.directions) {
 			di = direction[0];
 			dj = direction[1];
-			if(i + di > M1.size() -1||i + di < 0 ) continue;
-			if(j +dj > M1.get(i).length -1|| j + dj < 0) continue;
-			if (M1.get(i)[j] != M1.get(i+ di)[j + dj])continue;
+			if(i + di > matrix.size() -1||i + di < 0 ) continue;
+			if(j +dj > matrix.get(i).length -1|| j + dj < 0) continue;
+			if (matrix.get(i)[j] != matrix.get(i+ di)[j + dj])continue;
 			if (countedPosition[i + di][j + dj])continue;
 			count++;
 			countedPosition[i + di][j + dj] = true;
 			this.positionPointer.add(new int[] {i + di, j + dj});
 		}
 	}
-	public String findPaintStain(List<char[]> M1) {
-		this.setPointerCounted(M1.size(), M1.get(0).length);
-		for (int i = 0; i < M1.size(); i++) {
-			for (int j = 0; j < M1.get(i).length; j++) {
+	public String findPaintStain(List<char[]> matrix) {
+		this.setPointerCounted(matrix.size(), matrix.get(0).length);
+		for (int i = 0; i < matrix.size(); i++) {
+			for (int j = 0; j < matrix.get(i).length; j++) {
 				if (!this.countedPosition[i][j]) {
 					this.positionPointer.add(new int[] { i, j });
 					
 					while(!positionPointer.isEmpty()){
-						this.findByAllDirection(this.positionPointer.poll(), M1);
+						this.findByAllDirection(this.positionPointer.poll(), matrix);
 					}
 					if (this.paintStainSize < this.count) {
 						this.paintStainSize = count;
-						this.paintStain = M1.get(i)[j];
+						this.paintStain = matrix.get(i)[j];
 					}
 					this.restartCounter();
 				}
