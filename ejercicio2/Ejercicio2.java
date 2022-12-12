@@ -3,9 +3,9 @@ package ejercicio2;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.TreeMap;
@@ -15,16 +15,16 @@ import java.util.TreeMap;
  *
  */
 public class Ejercicio2 {
-	static CardinalNumbers cardinalNumber = new CardinalNumbers();
-	static String output = "";
-
+	
+	static CardinalNumbers cardinalNumber;
 	public static void main(String[] args) {
-		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]));) {
+		try (Stream<String> inputLines = Files.lines(Paths.get("ejercicio2-input.txt"));) {
 			AtomicInteger caseNumber = new AtomicInteger(1);
 			inputLines.forEach(line -> {
 				if (line.startsWith("#")) {
 					caseNumber.set(Integer.parseInt(line.replace("# Case ", "")));
 				} else{
+					cardinalNumber = new CardinalNumbers();
 					System.out.println(String.valueOf(caseNumber.get())+ ". "+
 							cardinalNumber.decimalToCardinal(Integer.parseInt(line)));
 				}
@@ -38,7 +38,9 @@ public class Ejercicio2 {
 
 class CardinalNumbers {
 	
-	Map<Integer, String> mapDecimalDigitCardinals = new TreeMap<Integer, String>(Collections.reverseOrder());
+	private boolean flag = false;
+	NavigableMap<Integer, String> mapDecimalDigitCardinals = new TreeMap<Integer, String>();
+	
 	public  CardinalNumbers() {
 		this.mapDecimalDigitCardinals.putAll(
 				Map.of(0, "cero",
@@ -67,7 +69,7 @@ class CardinalNumbers {
 						30, "treinta", 
 						40, "cuarenta", 
 						50, "cincuenta", 
-						60, "secenta", 
+						60, "sesenta", 
 						70, "setenta", 
 						80, "ochenta", 
 						90, "noventa", 
@@ -85,8 +87,8 @@ class CardinalNumbers {
 	}
 
 	public String decimalToCardinal(int number) {
-
-		for (Entry<Integer, String> entry : mapDecimalDigitCardinals.entrySet()) {
+		if(number >= 0) {
+		Entry<Integer, String> entry = this.mapDecimalDigitCardinals.floorEntry(number);
 			if (entry.getKey() <= number) {
 				return format(entry.getKey(), entry.getValue(), number);
 			}
@@ -95,6 +97,9 @@ class CardinalNumbers {
 	}
 
 	private String format(int key, String value, int number) {
+		if (flag && key ==0)
+			return "";
+		flag = true;
 		if (number == key)
 			return value;
 		if (number < 30)
@@ -103,10 +108,11 @@ class CardinalNumbers {
 			return value + " y " + decimalToCardinal(number % key);
 		if (number < 200)
 			return value + "to " + decimalToCardinal(number % key);
-		if (number < 1000)
+		if (number < 2000)
 			return value + " " + decimalToCardinal(number % key);
 		if (number < 1000000)
-			return decimalToCardinal(number / key) + value + " " + decimalToCardinal(number % key);
+			return decimalToCardinal(number / key) +" "+ value + " " + decimalToCardinal(number % key);
 		return "fuera de rango";
 	}
+
 }
