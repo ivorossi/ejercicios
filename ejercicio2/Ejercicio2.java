@@ -1,5 +1,4 @@
 package ejercicio2;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -9,14 +8,13 @@ import java.util.NavigableMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.TreeMap;
-
 /**
  * @author rossi
  *
  */
 public class Ejercicio2 {
-	
 	static CardinalNumbers cardinalNumber;
+	
 	public static void main(String[] args) {
 		try (Stream<String> inputLines = Files.lines(Paths.get("ejercicio2-input.txt"));) {
 			AtomicInteger caseNumber = new AtomicInteger(1);
@@ -29,7 +27,6 @@ public class Ejercicio2 {
 							cardinalNumber.decimalToCardinal(Integer.parseInt(line)));
 				}
 			});
-			
 		} catch (IOException e) {
 			System.out.println("No se encontro la direccion del archivo");
 		}
@@ -88,7 +85,7 @@ class CardinalNumbers {
 
 	public String decimalToCardinal(int number) {
 		if(number >= 0) {
-		Entry<Integer, String> entry = this.mapDecimalDigitCardinals.floorEntry(number);
+			Entry<Integer, String> entry = this.mapDecimalDigitCardinals.floorEntry(number);
 			if (entry.getKey() <= number) {
 				return format(entry.getKey(), entry.getValue(), number);
 			}
@@ -114,5 +111,4 @@ class CardinalNumbers {
 			return decimalToCardinal(number / key) +" "+ value + " " + decimalToCardinal(number % key);
 		return "fuera de rango";
 	}
-
 }
