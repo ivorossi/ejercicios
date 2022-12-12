@@ -14,9 +14,8 @@ import java.util.TreeMap;
  */
 public class Ejercicio2 {
 	static CardinalNumbers cardinalNumber;
-	
 	public static void main(String[] args) {
-		try (Stream<String> inputLines = Files.lines(Paths.get("ejercicio2-input.txt"));) {
+		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]));) {
 			AtomicInteger caseNumber = new AtomicInteger(1);
 			inputLines.forEach(line -> {
 				if (line.startsWith("#")) {
