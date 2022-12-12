@@ -1,49 +1,48 @@
 package ejercicio1;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class Ejercicio1 {
+	static StainFinder stainFinder = new StainFinder();
+	static String output = "";
 	public static void main(String[] args) {
-
-		Stream<String> imput = null;
-		try {
-			imput = Files.lines(Paths.get(args[0]));
-			StringBuilder output = new StringBuilder();
-			ArrayList<char[]> M1 = new ArrayList<char[]>();
-			AtomicBoolean flag = new AtomicBoolean(false);
-			Finder finder1 = new Finder();
-			imput.forEach(line -> {
-				if (line.charAt(0) == 35) {
-					if (flag.getAndSet(true)) {
-						output.append(finder1.findPaintStain(M1)).append("\n");
-					}
-					output.append(line.substring(line.length() - 1))
-						.append(". ");
-					M1.clear();
-					finder1.clear();
-				} else {
-					M1.add(line.toCharArray());
+		try(Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
+			List<char[]> inputMatrix = new ArrayList<char[]>();
+			AtomicInteger caseNumber = new AtomicInteger(1);
+			inputLines.forEach(line -> {
+				if (!line.startsWith("#")){
+					inputMatrix.add(line.toCharArray());
+				} else if(!inputMatrix.isEmpty()) {
+					caseNumber.set(Integer.parseInt(line.replace("# Case ", "")));
+					output += String.valueOf(caseNumber.decrementAndGet()) +
+							stainFinder.findPaintStain(inputMatrix)+("\n");
+					inputMatrix.clear();
+					stainFinder = new StainFinder();					
 				}
 			});
-			System.out.println(output.append(finder1.findPaintStain(M1)));
+			System.out.println(output += String.valueOf(caseNumber.incrementAndGet())+
+										(stainFinder.findPaintStain(inputMatrix)));
 		} catch (IOException e) {
 			System.out.println("No se encontro la direccion del archivo");
 		} 
 	}
 }
 
-class Finder {
+class StainFinder {
 	
-	private ArrayList<int[]> positionPointer = new ArrayList<int[]>();
+	private Queue<int[]> positionPointer = new ArrayDeque<int[]>();
 	private char paintStain;
 	private int paintStainSize;
 	private int count = 1;
 	private boolean[][] countedPosition;
+	private int[][] directions = {{-1,0,},{0,-1},{0,1},{1,0}};
 
 	private void restartCounter() {
 		this.positionPointer.clear();
@@ -61,59 +60,33 @@ class Finder {
 		countedPosition = new boolean[m][n];
 	}
 
-	private void byRight(int i, int j, ArrayList<char[]> M1) {
-		if (M1.get(i).length - 2 < j)return;
-		if (M1.get(i)[j] != M1.get(i)[j + 1])return;
-		if (countedPosition[i][j + 1])return;
-		this.count++;
-		this.countedPosition[i][j + 1] = true;
-		this.positionPointer.add(new int[] { i, j + 1 });
-
-	}
-
-	private void byDown(int i, int j, ArrayList<char[]> M1) {
-		if (M1.size() - 2 < i)return;
-		if (M1.get(i)[j] != M1.get(i + 1)[j])return;
-		if (countedPosition[i + 1][j])return;
-		count++;
-		countedPosition[i + 1][j] = true;
-		this.positionPointer.add(new int[] { i + 1, j });
-	}
-
-	private void byUp(int i, int j, ArrayList<char[]> M1) {
-		if (1 > i)return;
-		if (M1.get(i)[j] != M1.get(i - 1)[j])return;
-		if (countedPosition[i - 1][j])return;
-		count++;
-		countedPosition[i - 1][j] = true;
-		this.positionPointer.add(new int[] { i - 1, j });
-	}
-
-	private void byLeft(int i, int j, ArrayList<char[]> M1) {
-		if (1 > j)return;
-		if (M1.get(i)[j] != M1.get(i)[j - 1])return;
-		if (countedPosition[i][j - 1])return;
-		count++;
-		countedPosition[i][j - 1] = true;
-		this.positionPointer.add(new int[] { i, j - 1 });
-	}
-
-	private void findByAllDireccion(int i, int j, ArrayList<char[]> M1) {
+	private void findByAllDirection(int[] position, List<char[]> M1) {
+		int i = position [0];
+		int j = position [1];
+		int di;
+		int dj;
 		this.countedPosition[i][j] = true;
-		this.byRight(i, j, M1);
-		this.byLeft(i, j, M1);
-		this.byDown(i, j, M1);
-		this.byUp(i, j, M1);
+		for( int[] direction : this.directions) {
+			di = direction[0];
+			dj = direction[1];
+			if(i + di > M1.size() -1||i + di < 0 ) continue;
+			if(j +dj > M1.get(i).length -1|| j + dj < 0) continue;
+			if (M1.get(i)[j] != M1.get(i+ di)[j + dj])continue;
+			if (countedPosition[i + di][j + dj])continue;
+			count++;
+			countedPosition[i + di][j + dj] = true;
+			this.positionPointer.add(new int[] {i + di, j + dj});
+		}
 	}
-
-	public StringBuilder findPaintStain(ArrayList<char[]> M1) {
+	public String findPaintStain(List<char[]> M1) {
 		this.setPointerCounted(M1.size(), M1.get(0).length);
-		for (int i = 0; i < this.countedPosition.length; i++) {
-			for (int j = 0; j < this.countedPosition[i].length; j++) {
+		for (int i = 0; i < M1.size(); i++) {
+			for (int j = 0; j < M1.get(i).length; j++) {
 				if (!this.countedPosition[i][j]) {
 					this.positionPointer.add(new int[] { i, j });
-					for (int k = 0; k < positionPointer.size(); k++) {
-						this.findByAllDireccion(this.positionPointer.get(k)[0], this.positionPointer.get(k)[1], M1);
+					
+					while(!positionPointer.isEmpty()){
+						this.findByAllDirection(this.positionPointer.poll(), M1);
 					}
 					if (this.paintStainSize < this.count) {
 						this.paintStainSize = count;
@@ -123,10 +96,6 @@ class Finder {
 				}
 			}
 		}
-		return new StringBuilder("(")
-				.append(this.paintStain)
-				.append(", ")
-				.append(this.paintStainSize)
-				.append(")");
+		return String.format(". (%s, %d)", paintStain, paintStainSize);
 	}
 }
