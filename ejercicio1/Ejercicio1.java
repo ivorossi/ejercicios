@@ -10,69 +10,65 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class Ejercicio1 {
-	static StainFinder stainFinder = new StainFinder();
-	static String output = "";
-	public static void main(String[] args) {
-		try(Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
+	public static void main(String[] args) throws IOException{
+		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
 			List<char[]> inputMatrix = new ArrayList<char[]>();
-			AtomicInteger caseNumber = new AtomicInteger(1);
+			AtomicInteger caseNumber = new AtomicInteger();
 			inputLines.forEach(line -> {
 				if (!line.startsWith("#")){
 					inputMatrix.add(line.toCharArray());
-				} else if(!inputMatrix.isEmpty()) {
-					caseNumber.set(Integer.parseInt(line.replace("# Case ", "")));
-					output += String.valueOf(caseNumber.decrementAndGet()) +
-							stainFinder.findPaintStain(inputMatrix)+("\n");
+				} else if(!inputMatrix.isEmpty()) { 
+					StainFinder stainFinder = new StainFinder();
+					caseNumber.set(Integer.parseInt(line.replaceAll("\\D+", "")));
+					System.out.println(String.format("%d%s",(caseNumber.decrementAndGet()),
+							stainFinder.findPaintStain(inputMatrix)));
 					inputMatrix.clear();
 					stainFinder = new StainFinder();					
 				}
 			});
-			System.out.println(output += String.valueOf(caseNumber.incrementAndGet())+
+			StainFinder stainFinder = new StainFinder();
+			System.out.println(String.valueOf(caseNumber.incrementAndGet())+
 										(stainFinder.findPaintStain(inputMatrix)));
-		} catch (IOException e) {
-			System.out.println("No se encontro la direccion del archivo");
-		} 
+		}catch(IOException e){
+			throw new IOException("no se encontro el archivo");
+		}		
 	}
 }
 
 class StainFinder {
-	
+	static final private int[][] DIRECTIONS = {{-1,0,},{0,-1},{0,1},{1,0}};
+
 	private Queue<int[]> positionPointer = new ArrayDeque<int[]>();
 	private char paintStain;
 	private int paintStainSize;
 	private int count = 1;
 	private boolean[][] countedPosition;
-	private int[][] directions = {{-1,0,},{0,-1},{0,1},{1,0}};
 
 	private void restartCounter() {
 		this.positionPointer.clear();
 		this.count = 1;
 	}
 
-	public void clear() {
-		this.restartCounter();
-		this.countedPosition = null;
-		this.paintStainSize = 0;
-		this.paintStain = 0;
-	}
-
 	private void setPointerCounted(int m, int n) {
 		countedPosition = new boolean[m][n];
 	}
-
+	private boolean shouldCountForStain(int i, int j, int di, int dj, List<char[]> matrix) {
+		if(i + di > matrix.size() -1||i + di < 0 ) return true;
+		if(j +dj > matrix.get(i).length -1|| j + dj < 0) return true;
+		if (matrix.get(i)[j] != matrix.get(i+ di)[j + dj])return true;
+		if (countedPosition[i + di][j + dj])return true;
+		return false;
+	}
 	private void findByAllDirection(int[] position, List<char[]> matrix) {
 		int i = position [0];
 		int j = position [1];
 		int di;
 		int dj;
 		this.countedPosition[i][j] = true;
-		for( int[] direction : this.directions) {
+		for( int[] direction : DIRECTIONS) {
 			di = direction[0];
 			dj = direction[1];
-			if(i + di > matrix.size() -1||i + di < 0 ) continue;
-			if(j +dj > matrix.get(i).length -1|| j + dj < 0) continue;
-			if (matrix.get(i)[j] != matrix.get(i+ di)[j + dj])continue;
-			if (countedPosition[i + di][j + dj])continue;
+			if(shouldCountForStain(i, j, di, dj, matrix) ) continue;
 			count++;
 			countedPosition[i + di][j + dj] = true;
 			this.positionPointer.add(new int[] {i + di, j + dj});
@@ -84,7 +80,6 @@ class StainFinder {
 			for (int j = 0; j < matrix.get(i).length; j++) {
 				if (!this.countedPosition[i][j]) {
 					this.positionPointer.add(new int[] { i, j });
-					
 					while(!positionPointer.isEmpty()){
 						this.findByAllDirection(this.positionPointer.poll(), matrix);
 					}
