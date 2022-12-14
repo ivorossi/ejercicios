@@ -13,32 +13,60 @@ import java.util.TreeMap;
  *
  */
 public class Ejercicio2 {
-	static CardinalNumbers cardinalNumber;
-	public static void main(String[] args) {
-		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]));) {
-			AtomicInteger caseNumber = new AtomicInteger(1);
+	public static void main(String[] args) throws IOException {
+		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
+			AtomicInteger caseNumber = new AtomicInteger();
 			inputLines.forEach(line -> {
 				if (line.startsWith("#")) {
-					caseNumber.set(Integer.parseInt(line.replace("# Case ", "")));
+					caseNumber.set(Integer.parseInt(line.replaceAll("\\D+", "")));
 				} else{
-					cardinalNumber = new CardinalNumbers();
-					System.out.println(String.valueOf(caseNumber.get())+ ". "+
-							cardinalNumber.decimalToCardinal(Integer.parseInt(line)));
+					try {
+						System.out.println(String.format("%d. %s",(caseNumber.get()),
+							CardinalNumbers.decimalToCardinal(Integer.parseInt(line), true)));
+					}catch(IllegalStateException e){
+						System.out.println(String.format("%d. %s",(caseNumber.get()),e));
+					}
 				}
 			});
-		} catch (IOException e) {
-			System.out.println("No se encontro la direccion del archivo");
+		}catch (IOException e) {
+			throw new IOException("No se encontro la direccion del archivo");
 		}
 	}
 }
 
-class CardinalNumbers {
+class CardinalNumbers  {
 	
-	private boolean flag = false;
-	NavigableMap<Integer, String> mapDecimalDigitCardinals = new TreeMap<Integer, String>();
+	private static final NavigableMap<Integer, String> MAP_DECIMAL_DIGIT_CARDINALS = new TreeMap<Integer, String>();
 	
-	public  CardinalNumbers() {
-		this.mapDecimalDigitCardinals.putAll(
+	public  static String decimalToCardinal(int number, boolean completeNumber){
+		if(number >= 0) {
+			Entry<Integer, String> entry = MAP_DECIMAL_DIGIT_CARDINALS.floorEntry(number);
+			return format(entry.getKey(), entry.getValue(), number, completeNumber);
+		}else
+			throw new IllegalStateException("solo numeros naturales");
+	}
+
+	private static String format(int key, String value, int number, boolean completeNumber) throws IllegalStateException{
+		if (!completeNumber && key ==0)
+			return "";
+		if (number == key)
+			return value;
+		if (number < 30)
+			return "veinti" + decimalToCardinal(number % key, false);
+		if (number < 100)
+			return value + " y " + decimalToCardinal(number % key, false);
+		if (number < 200)
+			return value + "to " + decimalToCardinal(number % key, false);
+		if (number < 2000)
+			return value + " " + decimalToCardinal(number % key, false);
+		if (number < 1000000)
+			return decimalToCardinal(number / key, false) +" "+ value + " " + decimalToCardinal(number % key, false);
+		else
+			throw new IllegalStateException("fuera de rango");
+	}
+	
+	static {
+		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
 				Map.of(0, "cero",
 						1, "uno",
 						2, "dos", 
@@ -49,7 +77,7 @@ class CardinalNumbers {
 						7, "siete", 
 						8, "ocho", 
 						9, "nueve"));
-		this.mapDecimalDigitCardinals.putAll(
+		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
 				Map.of(10, "diez",
 						11, "once", 
 						12, "doce", 
@@ -60,7 +88,7 @@ class CardinalNumbers {
 						17, "diecisiete", 
 						18, "dieciocho", 
 						19, "diecinueve"));
-		this.mapDecimalDigitCardinals.putAll(
+		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
 				Map.of(20, "veinte", 
 						30, "treinta", 
 						40, "cuarenta", 
@@ -70,7 +98,7 @@ class CardinalNumbers {
 						80, "ochenta", 
 						90, "noventa", 
 						100, "cien"));
-		this.mapDecimalDigitCardinals.putAll(
+		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
 				Map.of(200, "doscientos", 
 						300, "trecientos", 
 						400, "cuatrocientos", 
@@ -80,34 +108,5 @@ class CardinalNumbers {
 						800, "ochocientos", 
 						900, "novecientos", 
 						1000, "mil"));
-	}
-
-	public String decimalToCardinal(int number) {
-		if(number >= 0) {
-			Entry<Integer, String> entry = this.mapDecimalDigitCardinals.floorEntry(number);
-			if (entry.getKey() <= number) {
-				return format(entry.getKey(), entry.getValue(), number);
-			}
-		}
-		return "solo numeros naturales";
-	}
-
-	private String format(int key, String value, int number) {
-		if (flag && key ==0)
-			return "";
-		flag = true;
-		if (number == key)
-			return value;
-		if (number < 30)
-			return "veinti" + decimalToCardinal(number % key);
-		if (number < 100)
-			return value + " y " + decimalToCardinal(number % key);
-		if (number < 200)
-			return value + "to " + decimalToCardinal(number % key);
-		if (number < 2000)
-			return value + " " + decimalToCardinal(number % key);
-		if (number < 1000000)
-			return decimalToCardinal(number / key) +" "+ value + " " + decimalToCardinal(number % key);
-		return "fuera de rango";
 	}
 }
