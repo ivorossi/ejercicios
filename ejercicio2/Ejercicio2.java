@@ -16,7 +16,7 @@ import java.util.TreeMap;
  */
 public class Ejercicio2 {
 	public static void main(String[] args) throws IOException {
-		try (Stream<String> inputLines = Files.lines(Paths.get("ejercicio2-input.txt"))) {
+		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
 			AtomicInteger caseNumber = new AtomicInteger();
 			inputLines.forEach(line -> {
 				if (line.startsWith("#")) {
@@ -109,10 +109,10 @@ class CardinalNumbers {
 						60, "sesenta", 
 						70, "setenta", 
 						80, "ochenta", 
-						90, "noventa", 
-						100, "cien"));
+						90, "noventa"));
 		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
-				Map.of(	200, "doscientos", 
+				Map.of(	100, "cien",
+						200, "doscientos", 
 						300, "trecientos", 
 						400, "cuatrocientos", 
 						500, "quinientos", 
