@@ -1,4 +1,5 @@
 package ejercicio2;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -8,67 +9,79 @@ import java.util.NavigableMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.TreeMap;
+
 /**
  * @author rossi
  *
  */
 public class Ejercicio2 {
 	public static void main(String[] args) throws IOException {
-		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
+		try (Stream<String> inputLines = Files.lines(Paths.get("ejercicio2-input.txt"))) {
 			AtomicInteger caseNumber = new AtomicInteger();
 			inputLines.forEach(line -> {
 				if (line.startsWith("#")) {
 					caseNumber.set(Integer.parseInt(line.replaceAll("\\D+", "")));
-				} else{
+				} else {
 					try {
-						System.out.println(String.format("%d. %s",(caseNumber.get()),
-							CardinalNumbers.decimalToCardinal(Integer.parseInt(line), true)));
-					}catch(IllegalStateException e){
-						System.out.println(String.format("%d. %s",(caseNumber.get()),e));
+						System.out.println(String.format("%s. %s", (caseNumber),
+								CardinalNumbers.decimalToCardina(Integer.parseInt(line))));
+					} catch (IllegalStateException e) {
+						System.out.println(String.format("%s. %s", (caseNumber), e));
 					}
 				}
 			});
-		}catch (IOException e) {
-			throw new IOException("No se encontro la direccion del archivo");
+		} catch (IOException e) {
+			throw new IOException(e);
 		}
 	}
 }
 
-class CardinalNumbers  {
-	
+class CardinalNumbers {
 	private static final NavigableMap<Integer, String> MAP_DECIMAL_DIGIT_CARDINALS = new TreeMap<Integer, String>();
-	
-	public  static String decimalToCardinal(int number, boolean completeNumber){
-		if(number >= 0) {
-			Entry<Integer, String> entry = MAP_DECIMAL_DIGIT_CARDINALS.floorEntry(number);
-			return format(entry.getKey(), entry.getValue(), number, completeNumber);
-		}else
-			throw new IllegalStateException("solo numeros naturales");
+
+	public static String decimalToCardina(int number) {
+		if (number == 0) {
+			return "cero";
+		}
+		return findCardinal(number).trim();
 	}
 
-	private static String format(int key, String value, int number, boolean completeNumber) throws IllegalStateException{
-		if (!completeNumber && key ==0)
+	private static String findCardinal(int number) {
+		if (number == 0) {
 			return "";
-		if (number == key)
-			return value;
-		if (number < 30)
-			return "veinti" + decimalToCardinal(number % key, false);
-		if (number < 100)
-			return value + " y " + decimalToCardinal(number % key, false);
-		if (number < 200)
-			return value + "to " + decimalToCardinal(number % key, false);
-		if (number < 2000)
-			return value + " " + decimalToCardinal(number % key, false);
-		if (number < 1000000)
-			return decimalToCardinal(number / key, false) +" "+ value + " " + decimalToCardinal(number % key, false);
-		else
-			throw new IllegalStateException("fuera de rango");
+		}
+		if (number > 0) {
+			Entry<Integer, String> entry = MAP_DECIMAL_DIGIT_CARDINALS.floorEntry(number);
+			return format(entry.getKey(), entry.getValue(), number);
+		}
+		throw new IllegalStateException("solo numeros naturales");
 	}
-	
+
+	private static String format(int key, String value, int number) {
+		if (number == key) {
+			return value;
+		}
+		if (number < 30) {
+			return "veinti" + findCardinal(number % key);
+		}
+		if (number < 100) {
+			return value + " y " + findCardinal(number % key);
+		}
+		if (number < 200) {
+			return value + "to " + findCardinal(number % key);
+		}
+		if (number < 2000) {
+			return value + " " + findCardinal(number % key);
+		}
+		if (number < 1000000) {
+			return findCardinal(number / key).replace("uno", "un") + " " + value + " " + findCardinal(number % key);
+		}
+		throw new IllegalStateException("fuera de rango");
+	}
+
 	static {
 		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
-				Map.of(0, "cero",
-						1, "uno",
+				Map.of(	1, "uno", 
 						2, "dos", 
 						3, "tres", 
 						4, "cuatro", 
@@ -78,7 +91,7 @@ class CardinalNumbers  {
 						8, "ocho", 
 						9, "nueve"));
 		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
-				Map.of(10, "diez",
+				Map.of(	10, "diez", 
 						11, "once", 
 						12, "doce", 
 						13, "trece", 
@@ -89,7 +102,7 @@ class CardinalNumbers  {
 						18, "dieciocho", 
 						19, "diecinueve"));
 		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
-				Map.of(20, "veinte", 
+				Map.of(	20, "veinte", 
 						30, "treinta", 
 						40, "cuarenta", 
 						50, "cincuenta", 
@@ -99,7 +112,7 @@ class CardinalNumbers  {
 						90, "noventa", 
 						100, "cien"));
 		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
-				Map.of(200, "doscientos", 
+				Map.of(	200, "doscientos", 
 						300, "trecientos", 
 						400, "cuatrocientos", 
 						500, "quinientos", 
