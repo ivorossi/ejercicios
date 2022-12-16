@@ -36,48 +36,48 @@ public class Ejercicio1 {
 
 class StainFinder {
 	private static final Point[] DIRECTIONS = { new Point(0, 1), new Point(0, -1), new Point(1, 0), new Point(-1, 0) };
-	private final boolean[][] COUNTED_POSITIONS;
-
-	private List<char[]> matrix;
-	private Queue<Point> positionPointer = new ArrayDeque<Point>();
+	
+	private final boolean[][] countedPositions;
+	private final List<char[]> matrix;
+	private final Queue<Point> positionPointer;
 
 	public StainFinder(List<char[]> matrix) {
 		this.matrix = matrix;
-		this.COUNTED_POSITIONS = new boolean[matrix.size()][matrix.get(0).length];
+		this.countedPositions = new boolean[matrix.size()][matrix.get(0).length];
+		this.positionPointer = new ArrayDeque<Point>();
+	}
+	
+	private char getMatrix(Point point) {
+		return this.matrix.get(point.x)[point.y];
+	}
+	
+	private boolean getCountedPositions(Point point) {
+		return this.countedPositions[point.x][point.y];
+	}
+	
+	private void setCountedPositions(Point point) {
+		this.countedPositions[point.x][point.y] = true;
 	}
 
-	private boolean shouldCountForStain(int i, int j, int di, int dj) {
-		if (i + di > this.matrix.size() - 1 || i + di < 0) {
-			return true;
-		}
-		if (j + dj > this.matrix.get(i).length - 1 || j + dj < 0) {
-			return true;
-		}
-		if (this.matrix.get(i)[j] != this.matrix.get(i + di)[j + dj]) {
-			return true;
-		}
-		if (this.COUNTED_POSITIONS[i + di][j + dj]) {
-			return true;
-		}
-		return false;
+	private boolean shouldCountForStain(Point position, Point increasedPosition) {
+		return (increasedPosition.x > this.matrix.size() - 1 || increasedPosition.x < 0)||
+			(increasedPosition.y > this.matrix.get(0).length - 1 || increasedPosition.y < 0)|| 
+			(this.getMatrix(position)!= this.getMatrix(increasedPosition))||
+			(this.getCountedPositions(increasedPosition));
 	}
 
 	private int findByAllDirection(Point position) {
 		int count = 0;
-		int i = position.x;
-		int j = position.y;
-		int di;
-		int dj;
-		this.COUNTED_POSITIONS[i][j] = true;
+		this.setCountedPositions(position);
 		for (Point direction : DIRECTIONS) {
-			di = direction.x;
-			dj = direction.y;
-			if (this.shouldCountForStain(i, j, di, dj)) {
+			Point increasedPoint = new Point(position);
+			increasedPoint.translate(direction.x, direction.y);
+			if (this.shouldCountForStain(position, increasedPoint)) {
 				continue;
 			}
 			count++;
-			this.COUNTED_POSITIONS[i + di][j + dj] = true;
-			this.positionPointer.add(new Point(i + di, j + dj));
+			this.setCountedPositions(increasedPoint);
+			this.positionPointer.add(new Point(increasedPoint));
 		}
 		return count;
 	}
@@ -87,15 +87,16 @@ class StainFinder {
 		int paintStainSize = 0;
 		for (int i = 0; i < this.matrix.size(); i++) {
 			for (int j = 0; j < this.matrix.get(i).length; j++) {
-				if (!this.COUNTED_POSITIONS[i][j]) {
-					this.positionPointer.add(new Point(i, j));
+				Point Position = new Point(i,j);
+				if (!this.getCountedPositions(Position)) {
+					this.positionPointer.add(Position);
 					int count = 1;
 					while (!this.positionPointer.isEmpty()) {
 						count += this.findByAllDirection(this.positionPointer.poll());
 					}
 					if (paintStainSize < count) {
 						paintStainSize = count;
-						paintStain = this.matrix.get(i)[j];
+						paintStain = this.getMatrix(Position);
 					}
 				}
 			}
