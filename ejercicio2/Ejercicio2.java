@@ -31,54 +31,13 @@ public class Ejercicio2 {
 				}
 			});
 		} catch (IOException e) {
-			throw new IOException(e);
+			throw new IOException("no se pudo encontrar la direccion del archivo");
 		}
 	}
 }
 
 class CardinalNumbers {
 	private static final NavigableMap<Integer, String> MAP_DECIMAL_DIGIT_CARDINALS = new TreeMap<Integer, String>();
-
-	public static String decimalToCardina(int number) {
-		if (number == 0) {
-			return "cero";
-		}
-		return findCardinal(number).trim();
-	}
-
-	private static String findCardinal(int number) {
-		if (number == 0) {
-			return "";
-		}
-		if (number > 0) {
-			Entry<Integer, String> entry = MAP_DECIMAL_DIGIT_CARDINALS.floorEntry(number);
-			return format(entry.getKey(), entry.getValue(), number);
-		}
-		throw new IllegalStateException("solo numeros naturales");
-	}
-
-	private static String format(int key, String value, int number) {
-		if (number == key) {
-			return value;
-		}
-		if (number < 30) {
-			return "veinti" + findCardinal(number % key);
-		}
-		if (number < 100) {
-			return value + " y " + findCardinal(number % key);
-		}
-		if (number < 200) {
-			return value + "to " + findCardinal(number % key);
-		}
-		if (number < 2000) {
-			return value + " " + findCardinal(number % key);
-		}
-		if (number < 1000000) {
-			return findCardinal(number / key).replace("uno", "un") + " " + value + " " + findCardinal(number % key);
-		}
-		throw new IllegalStateException("fuera de rango");
-	}
-
 	static {
 		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
 				Map.of(	1, "uno", 
@@ -122,4 +81,43 @@ class CardinalNumbers {
 						900, "novecientos", 
 						1000, "mil"));
 	}
+
+	public static String decimalToCardina(int number) {
+		if (number == 0) {
+			return "cero";
+		}
+		return findCardinal(number).trim();
+	}
+
+	private static String findCardinal(int number) {
+		if (number == 0) {
+			return "";
+		}
+		Entry<Integer, String> entry = MAP_DECIMAL_DIGIT_CARDINALS.floorEntry(number);
+		return format(entry.getKey(), entry.getValue(), number);
+	}
+
+	private static String format(int key, String value, int number) {
+		if (number == key) {
+			return value;
+		}
+		if (number < 30) {
+			return "veinti" + findCardinal(number % key);
+		}
+		if (number < 100) {
+			return value + " y " + findCardinal(number % key);
+		}
+		if (number < 200) {
+			return value + "to " + findCardinal(number % key);
+		}
+		if (number < 2000) {
+			return value + " " + findCardinal(number % key);
+		}
+		if (number < 1000000) {
+			return findCardinal(number / key).replace("uno", "un") + " " + value + " " + findCardinal(number % key);
+		}
+		throw new IllegalStateException("fuera de rango");
+	}
+
+
 }
