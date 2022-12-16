@@ -47,7 +47,7 @@ class StainFinder {
 		this.positionPointer = new ArrayDeque<Point>();
 	}
 	
-	private char getMatrix(Point point) {
+	private char getColor(Point point) {
 		return this.matrix.get(point.x)[point.y];
 	}
 	
@@ -62,7 +62,7 @@ class StainFinder {
 	private boolean shouldCountForStain(Point position, Point increasedPosition) {
 		return (increasedPosition.x > this.matrix.size() - 1 || increasedPosition.x < 0)||
 			(increasedPosition.y > this.matrix.get(0).length - 1 || increasedPosition.y < 0)|| 
-			(this.getMatrix(position)!= this.getMatrix(increasedPosition))||
+			(this.getColor(position)!= this.getColor(increasedPosition))||
 			(this.getCountedPositions(increasedPosition));
 	}
 
@@ -96,7 +96,7 @@ class StainFinder {
 					}
 					if (paintStainSize < count) {
 						paintStainSize = count;
-						paintStain = this.getMatrix(Position);
+						paintStain = this.getColor(Position);
 					}
 				}
 			}
