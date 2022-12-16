@@ -60,10 +60,10 @@ class StainFinder {
 	}
 
 	private boolean shouldCountForStain(Point position, Point increasedPosition) {
-		return (increasedPosition.x > this.matrix.size() - 1 || increasedPosition.x < 0)||
+		return !((increasedPosition.x > this.matrix.size() - 1 || increasedPosition.x < 0)||
 			(increasedPosition.y > this.matrix.get(0).length - 1 || increasedPosition.y < 0)|| 
 			(this.getColor(position)!= this.getColor(increasedPosition))||
-			(this.getCountedPositions(increasedPosition));
+			(this.getCountedPositions(increasedPosition)));
 	}
 
 	private int findByAllDirection(Point position) {
@@ -73,11 +73,10 @@ class StainFinder {
 			Point increasedPoint = new Point(position);
 			increasedPoint.translate(direction.x, direction.y);
 			if (this.shouldCountForStain(position, increasedPoint)) {
-				continue;
+				count++;
+				this.setCountedPositions(increasedPoint);
+				this.positionPointer.add(new Point(increasedPoint));	
 			}
-			count++;
-			this.setCountedPositions(increasedPoint);
-			this.positionPointer.add(new Point(increasedPoint));
 		}
 		return count;
 	}
