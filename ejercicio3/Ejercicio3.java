@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class Ejercicio3 {
 
 	public static void main(String[] args) throws IOException {
-		try (Stream<String> inputLines = Files.lines(Paths.get("ejercicio3-input"))) {
+		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
 			AtomicInteger caseNumber = new AtomicInteger();
 			inputLines.forEach(line -> {
 				if (line.startsWith("#")) {
