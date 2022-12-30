@@ -24,7 +24,7 @@ public class Ejercicio2 {
 				} else {
 					try {
 						System.out.println(String.format("%s. %s", (caseNumber),
-								CardinalNumbers.decimalToCardina(Integer.parseInt(line))));
+								CardinalNumbers.simbolToCardina(Integer.parseInt(line))));
 					} catch (IllegalStateException e) {
 						System.out.println(String.format("%s. %s", (caseNumber), e));
 					}
@@ -82,39 +82,35 @@ class CardinalNumbers {
 						1000, "mil"));
 	}
 
-	public static String decimalToCardina(int number) {
-		if (number == 0) {
-			return "cero";
-		}
-		return findCardinal(number).trim();
+	public static String simbolToCardina(int number) {
+		return number == 0 ? "cero" : findCardinal(number).trim();
 	}
 
 	private static String findCardinal(int number) {
-		if (number == 0) {
-			return "";
-		}
-		Entry<Integer, String> entry = MAP_DECIMAL_DIGIT_CARDINALS.floorEntry(number);
-		return format(entry.getKey(), entry.getValue(), number);
+		return number == 0 ? "" : format(number);
+		
 	}
 
-	private static String format(int key, String value, int number) {
-		if (number == key) {
-			return value;
+	private static String format( int number) {
+		Entry<Integer, String> entry = MAP_DECIMAL_DIGIT_CARDINALS.floorEntry(number);
+		
+		if (number == entry.getKey()) {
+			return entry.getValue();
 		}
 		if (number < 30) {
-			return "veinti" + findCardinal(number % key);
+			return "veinti" + findCardinal(number % entry.getKey());
 		}
 		if (number < 100) {
-			return value + " y " + findCardinal(number % key);
+			return entry.getValue() + " y " + findCardinal(number % entry.getKey());
 		}
 		if (number < 200) {
-			return value + "to " + findCardinal(number % key);
+			return entry.getValue() + "to " + findCardinal(number % entry.getKey());
 		}
 		if (number < 2000) {
-			return value + " " + findCardinal(number % key);
+			return entry.getValue() + " " + findCardinal(number % entry.getKey());
 		}
 		if (number < 1000000) {
-			return findCardinal(number / key).replace("uno", "un") + " " + value + " " + findCardinal(number % key);
+			return findCardinal(number / entry.getKey()).replace("uno", "un") + " " + entry.getValue() + " " + findCardinal(number % entry.getKey());
 		}
 		throw new IllegalStateException("fuera de rango");
 	}
