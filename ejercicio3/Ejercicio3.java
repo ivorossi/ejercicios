@@ -3,6 +3,8 @@ package ejercicio3;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -25,13 +27,28 @@ public class Ejercicio3 {
 	}
 }
 class DigitalClock{
-	static final String[]SAME_TIMES_IN_THEE_MIRROR = {"00:00", "02:50", "05:20", "20:05"};
-	static public String howItLooksInTheMirror(String time) {
-		for(String sameTime :SAME_TIMES_IN_THEE_MIRROR) {
-			if(time.equals(sameTime)){
-				return "Se ve igual";
-			}
-		}
-		return "No se ve igual";
+	static Map<String,String> SAME_TIMES_IN_THE_MIRROR = new HashMap<String,String>();
+	static{SAME_TIMES_IN_THE_MIRROR.putAll(
+			Map.of(	"0", "0",
+					"2", "5",
+					"5", "2",
+					"8", "8"));
 	}
+
+	static public String howItLooksInTheMirror(String time) {
+		int midel = time.length()/2;
+		for(int i = 0; i<midel;i++){
+			String value = SAME_TIMES_IN_THE_MIRROR.get(String.valueOf(time.charAt(i)));
+			if(!String.valueOf(time.charAt(time.length()-i-1)).equals(value)) {
+				return "No se ve igual";
+			}	
+		}
+		return"se ve igual";
+	}
+/*
+ * hola creo que quedaria mejor si en vez de usar un map
+ * uso dos char[] encadenados para trabajar todo con primitivos
+ * pero me imagino que esta era la idea de la solucion no?
+ * 
+ */
 }
