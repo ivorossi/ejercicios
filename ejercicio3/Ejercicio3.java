@@ -27,28 +27,26 @@ public class Ejercicio3 {
 	}
 }
 class DigitalClock{
-	static Map<String,String> SAME_TIMES_IN_THE_MIRROR = new HashMap<String,String>();
+	static Map<Character,Character> SAME_TIMES_IN_THE_MIRROR = new HashMap<Character,Character>();
 	static{SAME_TIMES_IN_THE_MIRROR.putAll(
-			Map.of(	"0", "0",
-					"2", "5",
-					"5", "2",
-					"8", "8"));
+			Map.of(	'0', '0',
+					'2', '5',
+					'5', '2',
+					'8', '8'));
 	}
 
 	static public String howItLooksInTheMirror(String time) {
-		int midel = time.length()/2;
-		for(int i = 0; i<midel;i++){
-			String value = SAME_TIMES_IN_THE_MIRROR.get(String.valueOf(time.charAt(i)));
-			if(!String.valueOf(time.charAt(time.length()-i-1)).equals(value)) {
+		
+		for(int i=0; i<time.length()/2; i++){
+			if(!SAME_TIMES_IN_THE_MIRROR.containsKey(time.charAt(i))) {
+				return "No se ve igual";
+			}
+			char value = SAME_TIMES_IN_THE_MIRROR.get(time.charAt(i));
+			if(!(time.charAt(time.length()-1-i) == value)) {
 				return "No se ve igual";
 			}	
 		}
 		return"se ve igual";
 	}
-/*
- * hola creo que quedaria mejor si en vez de usar un map
- * uso dos char[] encadenados para trabajar todo con primitivos
- * pero me imagino que esta era la idea de la solucion no?
- * 
- */
+
 }
