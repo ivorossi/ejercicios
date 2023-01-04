@@ -1,11 +1,11 @@
 package ejercicio6;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -14,7 +14,7 @@ public class Ejercicio6 {
 	public static void main(String[] args) throws IOException {
 
 		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
-			Set<Segment> inputSegment = new TreeSet<Segment>();
+			List<Segment> inputSegment = new ArrayList<Segment>();
 			AtomicInteger caseNumber = new AtomicInteger();
 			AtomicInteger metesWall = new AtomicInteger();
 			inputLines.forEach(line -> {
@@ -23,10 +23,12 @@ public class Ejercicio6 {
 						metesWall.set(Integer.parseInt(line));
 					} else {
 						String[] splitedLine = line.split(" ");
-						inputSegment.add(new Segment(Integer.parseInt(splitedLine[0]), Integer.parseInt(splitedLine[1])));
+						inputSegment
+								.add(new Segment(Integer.parseInt(splitedLine[0]), Integer.parseInt(splitedLine[1])));
 					}
 				} else {
 					if (!inputSegment.isEmpty()) {
+						Collections.sort(inputSegment);
 						System.out.println(String.format("%s. %d", caseNumber,
 								new Wall(metesWall.get()).totalCleanMeters(inputSegment)));
 						inputSegment.clear();
@@ -34,6 +36,7 @@ public class Ejercicio6 {
 					caseNumber.set(Integer.parseInt(line.replaceAll("\\D+", "")));
 				}
 			});
+			Collections.sort(inputSegment);
 			System.out.println(
 					String.format("%s. %d", caseNumber, new Wall(metesWall.get()).totalCleanMeters(inputSegment)));
 
@@ -45,27 +48,27 @@ public class Ejercicio6 {
 }
 
 class Wall {
-	private int metersLong;
+	private final int metersLong;
 
 	public Wall(int metersLong) {
 		this.metersLong = metersLong;
 	}
 
-	public int totalCleanMeters(Set<Segment> allGraffitis) {
-		Stack<Segment> splitedGraffitis = new Stack<Segment>();
-		splitedGraffitis.add(new Segment(0, 0));
-
-		for (Segment element : allGraffitis) {
-			if (splitedGraffitis.peek().getEnd() >= element.getStart()) {
-				if (splitedGraffitis.peek().getEnd() < element.getEnd()) {
-					splitedGraffitis.peek().setEnd(element.getEnd());
+	public int totalCleanMeters(List<Segment> allGraffitis) {
+		Segment lastGraffiti = new Segment(0, 0);
+		int metersCovered = 0;
+		for (Segment nextGtaffiti : allGraffitis) {
+			if (lastGraffiti.getEnd() >= nextGtaffiti.getStart()) {
+				if (lastGraffiti.getEnd() < nextGtaffiti.getEnd()) {
+					lastGraffiti.setEnd(nextGtaffiti.getEnd());
 				}
 			} else {
-				this.metersLong -= splitedGraffitis.pop().module();
-				splitedGraffitis.add(element);
+				metersCovered += lastGraffiti.module();
+				lastGraffiti = new Segment(nextGtaffiti);
 			}
 		}
-		return metersLong -= splitedGraffitis.pop().module();
+		metersCovered += lastGraffiti.module();
+		return metersLong - metersCovered;
 	}
 }
 
@@ -76,6 +79,11 @@ class Segment implements Comparable<Segment> {
 	public Segment(int start, int end) {
 		this.start = start;
 		this.end = end;
+	}
+
+	public Segment(Segment segment) {
+		this.start = segment.getStart();
+		this.end = segment.getEnd();
 	}
 
 	public int getStart() {
@@ -95,10 +103,9 @@ class Segment implements Comparable<Segment> {
 	}
 
 	@Override
-	public int compareTo(Segment o) {
-
-		return Integer.compare(this.start, o.start) == 0 ? 
-				Integer.compare(this.end, o.end)
-				: Integer.compare(this.start, o.start);
+	public int compareTo(Segment other) {
+		return Comparator.comparingInt(Segment::getStart)
+				.thenComparingInt(Segment::getEnd)
+				.compare(this, other);
 	}
 }
