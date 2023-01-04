@@ -3,7 +3,6 @@ package ejercicio3;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -27,26 +26,24 @@ public class Ejercicio3 {
 }
 
 class DigitalClock {
-	static Map<Character, Character> SAME_TIMES_IN_THE_MIRROR = new HashMap<Character, Character>();
-	static {
-		SAME_TIMES_IN_THE_MIRROR.putAll(
-				Map.of(	'0', '0',
-						'2', '5',
-						'5', '2',
-						'8', '8'));
-	}
+	private static final Map<Character, Character> SAME_TIMES_IN_THE_MIRROR = 
+			Map.of(	'0', '0',
+					'2', '5',
+					'5', '2',
+					'8', '8');
 
-	static public String howItLooksInTheMirror(String time) {
+
+	public static String howItLooksInTheMirror(String time) {
+		return isMirror(time) ? "se ve igual" : "no se ve igual";
+	}
+	
+	private static boolean isMirror(String time) {
 		for (int i = 0; i < time.length() / 2; i++) {
-			if (!SAME_TIMES_IN_THE_MIRROR.containsKey(time.charAt(i))) {
-				return "No se ve igual";
-			}
-			char value = SAME_TIMES_IN_THE_MIRROR.get(time.charAt(i));
-			if (!(time.charAt(time.length() - 1 - i) == value)) {
-				return "No se ve igual";
-			}
+			if (!SAME_TIMES_IN_THE_MIRROR.containsKey(time.charAt(i))||
+				time.charAt(time.length() - 1 - i) != SAME_TIMES_IN_THE_MIRROR.get(time.charAt(i))) {
+				return false;
+			}	
 		}
-		return "se ve igual";
+		return true;
 	}
-
 }
