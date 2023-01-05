@@ -40,7 +40,8 @@ class CardinalNumbers {
 	private static final NavigableMap<Integer, String> MAP_DECIMAL_DIGIT_CARDINALS = new TreeMap<Integer, String>();
 	static {
 		MAP_DECIMAL_DIGIT_CARDINALS.putAll(
-				Map.of(	1, "uno", 
+				Map.of(	0, "",
+						1, "uno", 
 						2, "dos", 
 						3, "tres", 
 						4, "cuatro", 
@@ -83,12 +84,7 @@ class CardinalNumbers {
 	}
 
 	public static String simbolToCardina(int number) {
-		return number == 0 ? "cero" : findCardinal(number).trim();
-	}
-
-	private static String findCardinal(int number) {
-		return number == 0 ? "" : format(number);
-		
+		return number == 0 ? "cero" : format(number).trim();
 	}
 
 	private static String format( int number) {
@@ -96,23 +92,19 @@ class CardinalNumbers {
 		
 		if (number == entry.getKey()) {
 			return entry.getValue();
+		}else if (number < 30) {
+			return "veinti" + format(number % entry.getKey());
+		}else if (number < 100) {
+			return entry.getValue() + " y " + format(number % entry.getKey());
+		}else if (number < 200) {
+			return entry.getValue() + "to " + format(number % entry.getKey());
+		}else if (number < 2000) {
+			return entry.getValue() + " " + format(number % entry.getKey());
+		}else if (number < 1000000) {
+			return format(number / entry.getKey()).replace("uno", "un") + " " + entry.getValue() + " " + format(number % entry.getKey());
+		}else {
+			throw new IllegalStateException("fuera de rango");
 		}
-		if (number < 30) {
-			return "veinti" + findCardinal(number % entry.getKey());
-		}
-		if (number < 100) {
-			return entry.getValue() + " y " + findCardinal(number % entry.getKey());
-		}
-		if (number < 200) {
-			return entry.getValue() + "to " + findCardinal(number % entry.getKey());
-		}
-		if (number < 2000) {
-			return entry.getValue() + " " + findCardinal(number % entry.getKey());
-		}
-		if (number < 1000000) {
-			return findCardinal(number / entry.getKey()).replace("uno", "un") + " " + entry.getValue() + " " + findCardinal(number % entry.getKey());
-		}
-		throw new IllegalStateException("fuera de rango");
 	}
 
 
