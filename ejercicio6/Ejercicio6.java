@@ -13,7 +13,7 @@ public class Ejercicio6 {
 
 	public static void main(String[] args) throws IOException {
 
-		try (Stream<String> inputLines = Files.lines(Paths.get("ejercicio6-input"))) {
+		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
 			List<Segment> inputSegment = new ArrayList<Segment>();
 			AtomicInteger caseNumber = new AtomicInteger();
 			AtomicInteger metesWall = new AtomicInteger();
@@ -55,19 +55,21 @@ class Wall {
 	}
 
 	public int totalCleanMeters(List<Segment> allGraffitis) {
-		Segment lastGraffiti = new Segment(0, 0);
+		int currentGraffitiStart = 0;
+		int currentGraffitiEnd = 0;
 		int metersCovered = 0;
-		for (Segment nextGtaffiti : allGraffitis) {
-			if (lastGraffiti.getEnd() >= nextGtaffiti.getStart()) {
-				if (lastGraffiti.getEnd() < nextGtaffiti.getEnd()) {
-					lastGraffiti = new Segment(lastGraffiti.getStart(), nextGtaffiti.getEnd());
+		for (Segment nextGraffiti : allGraffitis) {
+			if (currentGraffitiEnd >= nextGraffiti.getStart()) {
+				if (currentGraffitiEnd < nextGraffiti.getEnd()) {
+					currentGraffitiEnd = nextGraffiti.getEnd();
 				}
 			} else {
-				metersCovered += lastGraffiti.module();
-				lastGraffiti = new Segment(nextGtaffiti);
+				metersCovered += currentGraffitiEnd - currentGraffitiStart;
+				currentGraffitiStart = nextGraffiti.getStart();
+				currentGraffitiEnd = nextGraffiti.getEnd();
 			}
 		}
-		metersCovered += lastGraffiti.module();
+		metersCovered += currentGraffitiEnd - currentGraffitiStart;
 		return metersLong - metersCovered;
 	}
 }
@@ -92,10 +94,6 @@ class Segment implements Comparable<Segment> {
 
 	public int getEnd() {
 		return end;
-	}
-
-	public int module() {
-		return end - start;
 	}
 
 	@Override
