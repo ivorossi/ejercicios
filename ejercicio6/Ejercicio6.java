@@ -13,7 +13,7 @@ public class Ejercicio6 {
 
 	public static void main(String[] args) throws IOException {
 
-		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
+		try (Stream<String> inputLines = Files.lines(Paths.get("ejercicio6-input"))) {
 			List<Segment> inputSegment = new ArrayList<Segment>();
 			AtomicInteger caseNumber = new AtomicInteger();
 			AtomicInteger metesWall = new AtomicInteger();
@@ -60,7 +60,7 @@ class Wall {
 		for (Segment nextGtaffiti : allGraffitis) {
 			if (lastGraffiti.getEnd() >= nextGtaffiti.getStart()) {
 				if (lastGraffiti.getEnd() < nextGtaffiti.getEnd()) {
-					lastGraffiti.setEnd(nextGtaffiti.getEnd());
+					lastGraffiti = new Segment(lastGraffiti.getStart(), nextGtaffiti.getEnd());
 				}
 			} else {
 				metersCovered += lastGraffiti.module();
@@ -73,8 +73,8 @@ class Wall {
 }
 
 class Segment implements Comparable<Segment> {
-	private int start;
-	private int end;
+	private final int start;
+	private final int end;
 
 	public Segment(int start, int end) {
 		this.start = start;
@@ -92,10 +92,6 @@ class Segment implements Comparable<Segment> {
 
 	public int getEnd() {
 		return end;
-	}
-
-	public void setEnd(int end) {
-		this.end = end;
 	}
 
 	public int module() {
