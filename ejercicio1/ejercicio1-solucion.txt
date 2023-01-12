@@ -1,0 +1,12 @@
+Cuando leí por primera vez el ejercicio no crei fuera complicado, pero cuando me puse a codear
+me di cuenta que de que la unica forma de resolverlo que se me ocrrio al menos iba a ser 
+aplicando recursividad, el codigo cambio bastante desde que comence.
+Trate de hacer del problema lo menor posible empece por el algoritmo de busqueda por que no conocia
+ninguno parecido probando resolver matriz al azar en dos direcciones (derecha y abajo) una vez que
+quedaron bien las otras dos direcciones eran una compia practicamente, y bueno el resto del codigo 
+me imaginaba como iba a ser con quizas algunas coplicaiones como tener que usar una bandera y el 
+dowhile en vez del while en el bufferedReader como estoy mas acostumbrado. 
+hice pruebas usadon un ArrayList<char[]> en vez de un char[][] para las matrices que use 
+y no hay casi diferencia en los tiempos de ejecucuion  gana la matriz primitiva por poco, no me
+fije cuanta memoria ocupa pero seguro la matriz primitiva.
+Nada espero su reviews, saludos.  
