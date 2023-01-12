@@ -1,6 +1,7 @@
 package ejercicio5;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,7 +17,7 @@ public class Ejercicio5 {
 				if (line.startsWith("#")) {
 					caseNumber.set(Integer.parseInt(line.replaceAll("\\D+", "")));
 				} else {
-					System.out.println(String.format("%s. %d", (caseNumber),
+					System.out.println(String.format("%s. %s", (caseNumber),
 							Window.treeWindowsInRowWhithCourtain(Integer.parseInt(line))));
 				}
 			});
@@ -28,32 +29,27 @@ public class Ejercicio5 {
 
 class Window {
 
-	static public int treeWindowsInRowWhithCourtain(int windows) {
+	static public BigInteger treeWindowsInRowWhithCourtain(int windows) {
+		BigInteger value = new BigInteger("2");
 		/*
 		 * for all possible combinations of windows with or without curtains, returns
 		 * the number of combinations where there are three windows in a row with
 		 * curtains 0 0 1 3 8 20 47 107 238 520 1121
 		 */
-		return (int) Math.pow(2, windows) - Serie.getTribonacci(windows + 3);
+		return value.pow(windows).subtract(Serie.getTribonacci(windows + 3));
 	}
 }
 
 class Serie {
 
-	static int getTribonacci(int element) {
-		int[] tribonaciSerie = { 0, 0, 1 };
+	static BigInteger getTribonacci(int element) {
+		BigInteger[] tribonaciSerie = { new BigInteger("0"), new BigInteger("0"), new BigInteger("1") };
 		if (element < 3) {
 			return tribonaciSerie[element];
 		} else {
-			int tribonaciElement = 0;
+			BigInteger tribonaciElement = new BigInteger("0");
 			for (int i = 2; i < element; i++) {
-				tribonaciElement = tribonaciSerie[2] + tribonaciSerie[1] + tribonaciSerie[0];
-				/*
-				 * no se queda bien asi, o si hago las asignaciones con un bucle for, son la
-				 * misma canntidad de lineas supongo que no vale la pena, y tampoco se si vale
-				 * la pena esta clase pero como son cosas distintas supongo que esta bien
-				 * separarlos, despues borro el comentario.
-				 */
+				tribonaciElement = tribonaciSerie[2].add(tribonaciSerie[1]).add(tribonaciSerie[0]);
 				tribonaciSerie[0] = tribonaciSerie[1];
 				tribonaciSerie[1] = tribonaciSerie[2];
 				tribonaciSerie[2] = tribonaciElement;
