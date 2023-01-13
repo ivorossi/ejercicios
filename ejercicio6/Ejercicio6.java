@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -28,7 +27,7 @@ public class Ejercicio6 {
 					}
 				} else {
 					if (!inputSegment.isEmpty()) {
-						Collections.sort(inputSegment);
+						Collections.sort(inputSegment, (s1, s2) -> Integer.compare(s1.getStart(), s2.getStart()));
 						System.out.println(String.format("%s. %d", caseNumber,
 								new Wall(metesWall.get()).totalCleanMeters(inputSegment)));
 						inputSegment.clear();
@@ -36,7 +35,7 @@ public class Ejercicio6 {
 					caseNumber.set(Integer.parseInt(line.replaceAll("\\D+", "")));
 				}
 			});
-			Collections.sort(inputSegment);
+			Collections.sort(inputSegment, (s1, s2) -> Integer.compare(s1.getStart(), s2.getStart()));
 			System.out.println(
 					String.format("%s. %d", caseNumber, new Wall(metesWall.get()).totalCleanMeters(inputSegment)));
 
@@ -44,6 +43,7 @@ public class Ejercicio6 {
 			throw new IOException("no se encontro el archivo");
 		}
 	}
+	
 
 }
 
@@ -74,7 +74,7 @@ class Wall {
 	}
 }
 
-class Segment implements Comparable<Segment> {
+class Segment {
 	private final int start;
 	private final int end;
 
@@ -94,12 +94,5 @@ class Segment implements Comparable<Segment> {
 
 	public int getEnd() {
 		return end;
-	}
-
-	@Override
-	public int compareTo(Segment other) {
-		return Comparator.comparingInt(Segment::getStart)
-				.thenComparingInt(Segment::getEnd)
-				.compare(this, other);
 	}
 }
