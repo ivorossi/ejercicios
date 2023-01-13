@@ -1,1 +1,12 @@
 fue el que mas me costo seguro hay un moton de cosas para mejorar espero feedback
+– solución —
+empezamos por listar todas las piezas como Pieze Clase abstracta 
+de la cual heredan todas las piezas del ajedrez e implementan el método isAttackig( posición)
+cada una define las posiciones a las que ataca dependiendo de su posición, 
+para las piezas de rango como el alfil, la torre y la reina además de saber si la posición está rango
+se fija en la lista de piezas partiendo desde su ubicación e incrementando si hay alguna otra pieza que
+obstaculice el ataque.
+una clase Board porque es un ejercicio que puede escalar y probablemente termine siendo necesario
+donde tengo la lista de las piezas y las posiciones de los reyes para no tener que buscarlos en la lista.
+y después en la clase Chess un método isCheck() que recorre la lista de piezas pasandole la posición
+del rey enemigo según corresponda y verifique si está a bajo ataque
