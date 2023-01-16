@@ -1,0 +1,3 @@
+Me costo un poco, pero antes lo habia estado pensado y supuse que ordenar y simplificar los segmentos de los
+grafitis era la mejor manera, creo que se puede mejorar un poco el diseño del main me parece dificil de leer, no se, 
+espero un feedback y el de ajedrez se me complico un poco espero tener listo esto dias.
