@@ -1,0 +1,2 @@
+No me pareció complicado creo que es una solución sencilla, supongo que se puede calcular con una ecuación  
+pero no veo el patrón.
