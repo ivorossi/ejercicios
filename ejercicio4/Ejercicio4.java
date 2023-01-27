@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class Ejercicio4 {
 	public static void main(String[] args) throws IOException {
-		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
+		try (Stream<String> inputLines = Files.lines(Paths.get("ejercicio4-input"))) {
 			List<List<Character>> inputMatrix = new ArrayList<List<Character>>();
 			AtomicInteger caseNumber = new AtomicInteger();
 			inputLines.forEach(line -> {
@@ -37,14 +37,15 @@ class Chess {
 	private final Board board;
 
 	public Chess(List<List<Character>> matrix) {
+
 		this.board = new Board();
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				if (matrix.get(i).get(j) != '0') {
-					this.board.addPiece(new Point(i, j), matrix.get(i).get(j), (byte) 1);
+					this.board.addPiece(new Point(i, j), matrix.get(i).get(j), Color.WHITE);
 				}
 				if (matrix.get(i + 8).get(j) != '0') {
-					this.board.addPiece(new Point(i, j), matrix.get(i + 8).get(j), (byte) -1);
+					this.board.addPiece(new Point(i, j), matrix.get(i + 8).get(j), Color.BLACK);
 				}
 			}
 		}
@@ -55,208 +56,140 @@ class Chess {
 	}
 
 	private boolean isCheck() {
-
 		for (Piece piece : this.board.getPieces()) {
-			if (piece.getDirection() > 0) {
-				if (piece.isAttacking(this.board.getPositionBlackKing(), this.board))
-					return true;
-			} else {
-				if (piece.isAttacking(this.board.getPositionWhiteKing(), this.board))
-					return true;
+			if (piece.getIsAttaking().ifAttacking(this.board.getOtherKingPosition(piece.getColor()), this.board)) {				
+				return true;
 			}
 		}
-		return false;
+	return false;
+	}
+}
+
+class Board {
+	private Point positionBlackKing;
+	private Point positionWhiteKing;
+	private final List<Piece> pieces;
+
+	public Board() {
+		this.pieces = new ArrayList<Piece>();
 	}
 
-	class Board {
-		private Point positionBlackKing;
-		private Point positionWhiteKing;
-		private final List<Piece> pieces;
+	public void addPiece(Point position, char value, Color color) {
 
-		public Board() {
-			this.pieces = new ArrayList<Piece>();
-		}
-
-		public void addPiece(Point position, char value, byte direction) {
-
-			if (value == 'P') {
-				this.pieces.add(new Pawn(direction, position));
-			} else if (value == 'A') {
-				this.pieces.add(new Bishop(direction, position));
-			} else if (value == 'C') {
-				this.pieces.add(new Knight(direction, position));
-			} else if (value == 'T') {
-				this.pieces.add(new Rook(direction, position));
-			} else if (value == 'D') {
-				this.pieces.add(new Queen(direction, position));
-			} else if (value == 'R') {
-				this.pieces.add(new King(direction, position));
-				if (direction > 0) {
-					this.positionWhiteKing = position;
+		if (value == 'P'){
+			this.pieces.add(new Piece(color, position,(kingPositions, board) -> 
+				position.getX() == kingPositions.getX() - color.direction()
+				&& Math.abs(position.getY() - kingPositions.getY()) == 1
+				));
+		} else if (value == 'C'){
+			this.pieces.add(new Piece(color, position,(kingPositions,board) -> 
+				Math.abs(position.getX() - kingPositions.getX()) == 2
+				&& Math.abs(position.getY() - kingPositions.getY()) == 1
+				|| (Math.abs(position.getX() - kingPositions.getX()) == 1
+				&& Math.abs(position.getY() - kingPositions.getY()) == 2)
+				));
+		} else if (value == 'T' || value == 'A' || value == 'D') {
+			this.pieces.add(new Piece(color, position, (kingPositions, board) -> {
+				int dx = 0;
+				int dy = 0;
+				Point road = new Point(position);
+				if (value == 'T' || value == 'D') {
+					if (position.getX() == kingPositions.getX()) {
+						dy = position.getY() < kingPositions.getY() ? 1 : -1;
+					} else if (position.getY() == kingPositions.getY()) {
+						dx = position.getX() < kingPositions.getX() ? 1 : -1;
+					} else {
+						return false;
+					}
 				} else {
-					this.positionBlackKing = position;
+					if (Math.abs(position.getX() - kingPositions.getX()) == Math
+							.abs(position.getY() - kingPositions.getY())) {
+						dy = position.getY() < kingPositions.getY() ? 1 : -1;
+						dx = position.getX() < kingPositions.getX() ? 1 : -1;
+					} else {
+						return false;
+					}
 				}
-			}
-
-		}
-
-		public boolean isEmptyPositions(Point position) {
-			for (Piece piece : this.pieces) {
-				if (piece.getPosition().equals(position)) {
-					return false;
+				road.translate(dx, dy);
+				while (!road.equals(kingPositions)) {
+					if (!board.isEmptyPositions(road)) {
+						return false;
+					}
+					road.translate(dx, dy);
 				}
-			}
-			return true;
-		}
-
-		public Point getPositionBlackKing() {
-			return positionBlackKing;
-		}
-
-		public Point getPositionWhiteKing() {
-			return positionWhiteKing;
-		}
-
-		public List<Piece> getPieces() {
-			return pieces;
-		}
-
-	}
-
-	abstract class Piece {
-		byte direction;
-		Point position;
-
-		public Piece(byte direction, Point position) {
-			this.direction = direction;
-			this.position = position;
-		}
-
-		public byte getDirection() {
-			return direction;
-		}
-
-		public Point getPosition() {
-			return this.position;
-		}
-
-		public abstract boolean isAttacking(Point otherPositions, Board board);
-
-	}
-
-	class Pawn extends Piece {
-
-		public Pawn(byte direction, Point position) {
-			super(direction, position);
-		}
-
-		@Override
-		public boolean isAttacking(Point otherPositions, Board board) {
-
-			return this.position.getX() == otherPositions.getX() - this.direction
-					&& Math.abs(this.position.getY() - otherPositions.getY()) == 1;
-		}
-
-	}
-
-	class Knight extends Piece {
-
-		public Knight(byte direction, Point position) {
-			super(direction, position);
-		}
-
-		@Override
-		public boolean isAttacking(Point otherPositions, Board board) {
-			return (Math.abs(this.position.getX() - otherPositions.getX()) == 2
-					&& Math.abs(this.position.getY() - otherPositions.getY()) == 1)
-					|| (Math.abs(this.position.getX() - otherPositions.getX()) == 1
-							&& Math.abs(this.position.getY() - otherPositions.getY()) == 2);
-		}
-	}
-
-	class Bishop extends Piece {
-
-		public Bishop(byte direction, Point position) {
-			super(direction, position);
-		}
-
-		@Override
-		public boolean isAttacking(Point otherPositions, Board board) {
-			return isAttackingDirectly(false, this.position, otherPositions, board);
-		}
-	}
-
-	class Rook extends Piece {
-
-		public Rook(byte direction, Point position) {
-			super(direction, position);
-		}
-
-		@Override
-		public boolean isAttacking(Point otherPositions, Board board) {
-			return isAttackingDirectly(true, this.position, otherPositions, board);
-		}
-	}
-
-	class Queen extends Piece {
-
-		public Queen(byte direction, Point position) {
-			super(direction, position);
-		}
-
-		@Override
-		public boolean isAttacking(Point otherPositions, Board board) {
-			return isAttackingDirectly(true, this.position, otherPositions, board)
-					|| isAttackingDirectly(false, this.position, otherPositions, board);
-		}
-
-	}
-
-	class King extends Piece {
-
-		public King(byte direction, Point position) {
-			super(direction, position);
-		}
-
-		@Override
-		public boolean isAttacking(Point otherPositions, Board board) {
-			return Math.abs(this.position.getX() - otherPositions.getX()) <= 1
-					&& Math.abs(this.position.getY() - otherPositions.getY()) <= 1;
-		}
-	}
-
-	static public boolean isAttackingDirectly(boolean asRook, Point thisPosition, Point otherPositions, Board board) {
-		int dx;
-		int dy;
-		Point road = new Point(thisPosition);
-		if (asRook) {
-			if (thisPosition.getX() == otherPositions.getX()) {
-				dx = 0;
-				dy = thisPosition.getY() < otherPositions.getY() ? 1 : -1;
-			} else if (thisPosition.getY() == otherPositions.getY()) {
-				dy = 0;
-				dx = thisPosition.getX() < otherPositions.getX() ? 1 : -1;
+				return true;
+			}));
+		} else if (value == 'R') {
+			this.pieces.add(new Piece(color, position,(otherPositions, board) -> 
+				Math.abs(position.getX() - otherPositions.getX()) <= 1
+				&& Math.abs(position.getY() - otherPositions.getY()) <= 1));
+			if (color.isWhite()) {
+				this.positionWhiteKing = position;
 			} else {
-				return false;
-			}
-
-		} else {
-			if (Math.abs(thisPosition.getX() - otherPositions.getX()) == Math
-					.abs(thisPosition.getY() - otherPositions.getY())) {
-				dy = thisPosition.getY() < otherPositions.getY() ? 1 : -1;
-				dx = thisPosition.getX() < otherPositions.getX() ? 1 : -1;
-			} else {
-				return false;
+				this.positionBlackKing = position;
 			}
 		}
 
-		road.translate(dx, dy);
-		while (!road.equals(otherPositions)) {
-			if (!board.isEmptyPositions(road)) {
+	}
+	
+	public Point getOtherKingPosition(Color color) {
+		return color.isWhite()? this.positionBlackKing : this.positionWhiteKing;
+	}
+
+	public boolean isEmptyPositions(Point position) {
+		for (Piece piece : this.pieces) {
+			if (piece.getPosition().equals(position)) {
 				return false;
 			}
-			road.translate(dx, dy);
 		}
 		return true;
 	}
+
+	public List<Piece> getPieces() {
+		return pieces;
+	}
 }
+
+interface IsAttacking {
+	
+	public boolean ifAttacking(Point otherPositions, Board board);
+}
+
+class Piece {
+	private final Color color;
+	private final Point position;
+	private final IsAttacking isAttaking;
+
+	public Piece(Color color, Point position, IsAttacking isAttacking) {
+		this.color = color;
+		this.position = position;
+		this.isAttaking = isAttacking;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public Point getPosition() {
+		return this.position;
+	}
+
+	public IsAttacking getIsAttaking() {
+		return isAttaking;
+	}
+
+}
+
+enum Color {
+	BLACK,
+	WHITE;
+
+	public boolean isWhite() {
+		return this == (WHITE);
+	}
+
+	public int direction() {
+		return this == WHITE? 1 : -1; 
+	}
+}
+
