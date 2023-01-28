@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class Ejercicio4 {
 	public static void main(String[] args) throws IOException {
-		try (Stream<String> inputLines = Files.lines(Paths.get("ejercicio4-input"))) {
+		try (Stream<String> inputLines = Files.lines(Paths.get(args[0]))) {
 			List<List<Character>> inputMatrix = new ArrayList<List<Character>>();
 			AtomicInteger caseNumber = new AtomicInteger();
 			inputLines.forEach(line -> {
@@ -34,6 +34,7 @@ public class Ejercicio4 {
 }
 
 class Chess {
+	
 	private final Board board;
 
 	public Chess(List<List<Character>> matrix) {
