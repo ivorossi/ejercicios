@@ -186,7 +186,7 @@ enum Color {
 	WHITE;
 
 	public boolean isWhite() {
-		return this == (WHITE);
+		return this == WHITE;
 	}
 
 	public int direction() {
